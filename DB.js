@@ -7,6 +7,7 @@ const connectDB = async ()=>{
 
 try {
     await mongoose.connect(process.env.CONNECT_MONGO,{
+      dbName: 'NaveeGoods',
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
