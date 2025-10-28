@@ -38,7 +38,7 @@ const checkCred = async (req, res) => {  // Note: Added `res` parameter
     res.cookie('token', token, {
       httpOnly: true,      // Prevent XSS attacks
       secure: true,        // HTTPS-only (enable in production)
-      sameSite: 'strict',  // CSRF protection
+      sameSite: 'None',  // CSRF protection
       maxAge: 3600000,     // 1hr expiry (auto-deletes)
     });
 
