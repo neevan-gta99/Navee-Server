@@ -3,7 +3,7 @@ import SKU_Genertor from "../../utils/skuGenerator.js";
 import schemaOfVariant from "../../utils/schemaOfProductsVariants.js";
 
 const mensTopwearSchema = new mongoose.Schema({
-  sellerID: { type: String },
+  sellerID: { type: String, required: true},
   productID: { type: String, unique: true },
   name: { type: String, required: true },
   brand: { type: String, required: true },
@@ -21,6 +21,7 @@ const mensTopwearSchema = new mongoose.Schema({
   neck: { type: String, required: true },
   status: { type: String, default: "Active" },
   variants: [schemaOfVariant.sizeAndVariantsSchema],
+  hot: { type: String },
   // SKU is at the product level, as you requested
   sku: {type: String,unique: true},
   images: [

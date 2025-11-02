@@ -4,20 +4,32 @@ const menTopwear = async (req, res) => {
   try {
     const { success, failed } = await products_Model.addMenTopwear(req);
 
-    const message =
+    let message = "";
+    let statusCode;
+    
+    if(req.uploadType){
+      message =
       failed.length === 0
         ? "Bulk upload completed successfully!"
         : success.length === 0
           ? "Bulk upload failed completely."
           : "Bulk upload completed with partial success";
 
-    const statusCode =
+    statusCode =
       failed.length === 0
         ? 200
         : success.length === 0
           ? 400
           : 207;
+    }
+    else{
+      message =
+      failed.length === 0 ? `${req.body.name}! upload successfully!` : "Upload failed!";
+      statusCode =
+      failed.length === 0 ? 200 : 400;
 
+    }
+        
     res.status(statusCode).json({
       message,
       success,

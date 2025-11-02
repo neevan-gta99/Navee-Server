@@ -2,6 +2,7 @@ import fs from "fs";
 import csv from "csv-parser";
 import { Readable } from "stream";
 import Busboy from "busboy";
+import all_Codes from "../utils/codes.js";
 
 const csvParser = (req, res, next) => {
   const csvFile = req.files.sheet;
@@ -16,19 +17,12 @@ const csvParser = (req, res, next) => {
   stream
     .pipe(csv({
       mapHeaders: ({ header, index }) => {
-        // if (!header) return `column_${index}`;
-
-        // ✅ Step 1: Trim
+        
         let cleanedHeader = header.trim();
-
-        // ✅ Step 2: Remove spaces and convert to PascalCase
         cleanedHeader = cleanedHeader
           .split(" ")
           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
           .join("");
-
-        // Fallback if still empty
-        // if (!cleanedHeader) return `column_${index}`;
 
         return cleanedHeader;
       },
@@ -36,7 +30,6 @@ const csvParser = (req, res, next) => {
         if (typeof value === "string") {
           let cleanedValue = value.trim();
 
-          // ✅ Only convert numeric strings
           if (!isNaN(cleanedValue) && cleanedValue !== "") {
             return Number(cleanedValue);
           }
@@ -54,7 +47,7 @@ const csvParser = (req, res, next) => {
       results.push(row);
     })
     .on("end", () => {
-      // Inject global fields
+
       if (req.body && Object.keys(req.body).length > 0) {
         results.forEach((product) => {
           for (const key in req.body) {
@@ -66,7 +59,7 @@ const csvParser = (req, res, next) => {
       }
 
       if (!req.failedUploads) req.failedUploads = [];
-      // ✅ Image count validation
+      
       const validProducts = [];
       const failedProducts = [];
 
@@ -88,8 +81,15 @@ const csvParser = (req, res, next) => {
       req.products = validProducts;
       req.failedUploads.push(...failedProducts);
 
-      console.log("✅ Parsed products:", validProducts.length);
-      console.log("❌ Failed products:", failedProducts.length);
+      const withoutSpacedProCategory = req.body.collection.replace(/\s+/g, "");
+
+      if(all_Codes.miniCategoryMap[withoutSpacedProCategory]){
+          validProducts.map((product)=>{
+            if(product.Category){
+              product.Category = all_Codes.miniCategoryMap[withoutSpacedProCategory];
+            }
+          });
+        }
 
       next();
     })
@@ -100,7 +100,7 @@ const csvParser = (req, res, next) => {
 
 };
 
-function busboyParser(req, res, next) {
+function busboyParserForCSV(req, res, next) {
   const busboy = Busboy({ headers: req.headers });
 
   req.body = {};
@@ -120,7 +120,6 @@ function busboyParser(req, res, next) {
       const buffer = Buffer.concat(chunks);
 
       if (fieldname === "sheet") {
-        // ✅ Only one CSV expected — store as single object
         req.files.sheet = {
           filename,
           encoding,
@@ -129,7 +128,6 @@ function busboyParser(req, res, next) {
           size: buffer.length,
         };
       } else if (fieldname === "images") {
-        // ✅ Multiple images — store as array
         if (!req.files.images) req.files.images = [];
         req.files.images.push({
           filename,
@@ -139,7 +137,6 @@ function busboyParser(req, res, next) {
           size: buffer.length,
         });
       } else {
-        // Optional: handle other fields or log unknown ones
         console.warn(`Unexpected file field: ${fieldname}`);
       }
     });
@@ -164,5 +161,84 @@ function busboyParser(req, res, next) {
   req.pipe(busboy);
 }
 
-const parser = { csvParser, busboyParser };
+function busboyParserForXL(req, res, next) {
+  const busboy = Busboy({ headers: req.headers });
+
+  req.body = {};
+  req.files = {};
+
+  
+  busboy.on("field", (name, value) => {
+
+    if(name == "failedUploadsFromClient"){
+      req.failedUploadsFromClient = JSON.parse(value);
+      console.log(req.failedUploadsFromClient);
+      
+    }
+
+    else if (name == "products") {
+      try {
+        req.products = JSON.parse(value);
+        // console.log("✅ Cleaned products:", req.products);
+      } catch (err) {
+        console.error("❌ Invalid products JSON");
+        return res.status(400).json({ error: "Invalid products JSON" });
+      }
+    } else {
+      req.body[name] = value;
+    }
+
+  });
+
+  busboy.on("file", (fieldname, file, info) => {
+    const { filename, encoding, mimeType } = info;
+    const chunks = [];
+
+    file.on("data", (chunk) => chunks.push(chunk));
+
+    file.on("end", () => {
+      const buffer = Buffer.concat(chunks);
+
+      if (fieldname === "images") {
+        if (!req.files.images) req.files.images = [];
+        req.files.images.push({
+          filename,
+          encoding,
+          mimetype: mimeType,
+          data: buffer,
+          size: buffer.length,
+        });
+      } else {
+        console.warn(`⚠️ Unexpected file field: ${fieldname}`);
+      }
+    });
+
+    file.on("error", (err) => {
+      console.error("❌ File stream error:", err);
+    });
+  });
+
+  busboy.on("finish", () => {
+    if (Array.isArray(req.products)) {
+      req.products.forEach((product) => {
+        product.sellerID = req.body.sellerID;
+      });
+    }
+    console.log("✅ Busboy finished. Products:", Object.keys(req.files));
+    next();
+  });
+
+  busboy.on("error", (err) => {
+    console.error("❌ Busboy error:", err);
+    res.status(500).json({ error: "File upload failed" });
+  });
+
+  req.pipe(busboy);
+}
+
+
+
+
+
+const parser = { csvParser, busboyParserForCSV, busboyParserForXL };
 export default parser;

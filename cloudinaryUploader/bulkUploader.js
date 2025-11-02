@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs/promises";
 import cloudinary from "../utils/cloudinary.js";
 import ID_Generator from "../utils/sequenceIdGenerator.js";
+import all_Codes from "../utils/codes.js";
 
 const menTopWearUploadsBulk = async function (req, res, next) {
   
@@ -9,17 +10,18 @@ const menTopWearUploadsBulk = async function (req, res, next) {
     
     req.products = await Promise.all(
       req.products.map(async (product, productIndex) => {
-        const folderName = product.Category;
-        const subFolderName = product.SubCategory;
+        const folderName = req.body.collection
+        const subFolderName = product.SubCategory || req.body.gender || product.Gender;
         const proCategory = product.Category;
         
-        product.productID = await ID_Generator.getNextId("mtr", proCategory.replace(/\s+/g, ""));
-        product.gender = "Male";
+        if(!product.Gender) product.Gender = req.body.gender;
+        
+        const withoutSpacedProCategory = proCategory.replace(/\s+/g, "");
+        product.productID = await ID_Generator.getNextId( all_Codes.productCode[withoutSpacedProCategory] , proCategory.replace(/\s+/g, ""));
         
         const matchedImages = req.files.images.filter((file) =>
           product.Images.includes(file.filename)
       );
-      console.log( "ye rhi saari matched images", matchedImages);
 
         const uploadResults = await Promise.all(
           matchedImages.map((file, index) => {
@@ -70,7 +72,7 @@ const menTopWearUploadsBulk = async function (req, res, next) {
         return product;
       })
     );
-    req.productType = "bulk";
+    req.uploadType = "bulk";
     next();
   }
   catch (error) {

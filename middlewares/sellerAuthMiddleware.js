@@ -82,7 +82,7 @@ export const isTokenUserWithCookie = async (req, res, next) => {
       req.seller = {
         sellerId: decoded.sellerId,
       };
-      console.log("auth mai aaye",decoded.sellerId)
+      // console.log("auth mai aaye",decoded.sellerId)
     }
 
     // Security check if both query param and token exist

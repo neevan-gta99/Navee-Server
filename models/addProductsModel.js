@@ -18,19 +18,16 @@ import buildDTO from '../DTOs/productDTOs.js';
 import Size_Variant_Regex_Checker from '../utils/bulkUploadSizeVariantRegex.js';
 
 const addMenTopwear = async (req) => {
-    if (req.productType === "bulk") {
+    if (req.uploadType === "bulk") {
         const rejectedProducts = [];
 
         const results = await Promise.allSettled(
             req.products.map(async (product) => {
                 try {
-                    console.log("Yaha aaya Model mai");
-                    console.log(product.ProductName);
                     const menTop = await buildDTO.buildMensTopwearDTO(product, product.uploadedImages);
                     await menTop.save();
                     return menTop.productID;
                 } catch (err) {
-                    console.log("Error pakad li", err);
                     const identifier = product.ProductName || product.productID || "Unknown Product";
                     rejectedProducts.push(product);
                     throw new Error(`Product "${identifier}" failed: ${err.message}`);
@@ -46,26 +43,38 @@ const addMenTopwear = async (req) => {
             .filter(r => r.status === "rejected")
             .map(r => r.reason.message);
 
-        const failedFromValidation = req.failedUploads.map(r => `${r.ProductName} failed: ${r.reason}`);
+        const failedFromValidation = Array.isArray(req.failedUploads)
+            ? req.failedUploads.map(r => `${r.ProductName} failed: ${r.reason}`)
+            : [];
 
-        const failed = [...failedFromValidation, ...failedFromSave];
 
+        let failed = [];
+
+        if(req.failedUploadsFromClient){
+            failed = [...failedFromValidation, ...failedFromSave, ...req.failedUploadsFromClient];
+        }
+        else{
+
+            failed = [...failedFromValidation, ...failedFromSave];
+        }
+        
         console.log("Success:", success);
         console.log("Failed:", failed);
 
         return { success, failed };
     }
 
-
     // Single product flow
     else {
         const body = req.body;
+        let failed = [];
 
         if (typeof body.variants === "string") {
             try {
                 body.variants = JSON.parse(body.variants);
             } catch (err) {
-                throw new Error("Invalid variants format");
+                failed.push(`${body.name}! Invalid variants format`)
+                // throw new Error("Invalid variants format");
             }
         }
 
@@ -307,8 +316,8 @@ const addBoysBrands = async (req) => {
         name: body.name,
         brand: body.brand,
         category: body.category,
-        productType: body.productType,
         subCategory: body.subCategory,
+        subSubCategory: body.subSubCategory,
         price: body.price,
         discount: body.discount,
         material: body.material,
@@ -347,8 +356,8 @@ const addGirlsGrands = async (req) => {
         name: body.name,
         brand: body.brand,
         category: body.category,
-        productType: body.productType,
         subCategory: body.subCategory,
+        subSubCategory: body.subSubCategory,
         price: body.price,
         discount: body.discount,
         material: body.material,
@@ -388,8 +397,8 @@ const addMenWA = async (req) => {
         name: body.name,
         brand: body.brand,
         category: body.category,
-        productType: body.productType,
         subCategory: body.subCategory,
+        subSubCategory: body.subSubCategory,
         price: body.price,
         discount: body.discount,
         material: body.material,
@@ -429,8 +438,8 @@ const addWomenWA = async (req) => {
         name: body.name,
         brand: body.brand,
         category: body.category,
-        productType: body.productType,
         subCategory: body.subCategory,
+        subSubCategory: body.subSubCategory,
         price: body.price,
         discount: body.discount,
         material: body.material,
@@ -471,8 +480,8 @@ const addBoyWA = async (req) => {
         name: body.name,
         brand: body.brand,
         category: body.category,
-        productType: body.productType,
         subCategory: body.subCategory,
+        subSubCategory: body.subSubCategory,
         price: body.price,
         discount: body.discount,
         material: body.material,
@@ -512,8 +521,8 @@ const addGirlWA = async (req) => {
         name: body.name,
         brand: body.brand,
         category: body.category,
-        productType: body.productType,
         subCategory: body.subCategory,
+        subSubCategory: body.subSubCategory,
         price: body.price,
         discount: body.discount,
         material: body.material,

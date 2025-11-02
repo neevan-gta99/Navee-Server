@@ -40,18 +40,18 @@ function generateSKUForWomenFootwear(productID, name, outerMaterial, occasion) {
   const occasionCode = occasion.toUpperCase();
   return `${productID}-${nameCode}-${outerMaterialCode}-${occasionCode}`;
 }
-function generateSKUForBBdsAndGGds(productID, name, productType, mat) {
+function generateSKUForBBdsAndGGds(productID, name, subCategory, mat) {
   const nameCode = name.replace(/\s+/g, '').toUpperCase().slice(0, 5);
-  const productTypeCode = productType.toUpperCase();
+  const subCategoryCode = subCategory.toUpperCase();
   // Correcting the syntax here
   const matCode = mat.toUpperCase();
-  return `${productID}-${nameCode}-${matCode}-${productTypeCode}`;
+  return `${productID}-${nameCode}-${matCode}-${subCategoryCode}`;
 }
-function generateSKUforWatchesAndAccessories(productID, name, productType, mat) {
+function generateSKUforWatchesAndAccessories(productID, name, subCategory, mat) {
   const nameCode = name.replace(/\s+/g, '').toUpperCase().slice(0, 5);
-  const productTypeCode = productType.toUpperCase();
+  const subCategoryCode = subCategory.toUpperCase();
   const matCode = mat.toUpperCase();
-  return `${productID}-${nameCode}-${productTypeCode}-${matCode}`;
+  return `${productID}-${nameCode}-${subCategoryCode}-${matCode}`;
 }
 function generateSKUforBSL(productID, name, material, capacity) {
   const nameCode = name.replace(/\s+/g, '').toUpperCase().slice(0, 5);

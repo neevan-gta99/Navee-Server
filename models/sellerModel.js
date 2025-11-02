@@ -3,7 +3,7 @@ import sellerDTO from '../schemas/sellerSchema.js';
 const getSeller = async (req) => {
   try {
     
-    console.log("aayi call");
+    // console.log("aayi call");
     
     let sellerId = req.query?.sellerId || req.seller?.sellerId;
     let foundSeller;
@@ -13,7 +13,7 @@ const getSeller = async (req) => {
     }
 
     if (foundSeller) {
-      console.log("✅ Seller found:", foundSeller.fullName);
+      // console.log("✅ Seller found:", foundSeller.fullName);
       return { code: 200, message: foundSeller };
     } else {
       console.warn("⚠️ Seller not found for ID:", sellerId);

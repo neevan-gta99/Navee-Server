@@ -8,8 +8,8 @@ const womensWASchema = new mongoose.Schema({
   name: { type: String, required: true },
   brand: { type: String, required: true },
   category: { type: String, required: true },
-  productType: { type: String, required: true },
   subCategory: { type: String, required: true },
+  subSubCategory: { type: String, required: true },
   gender: { type: String, required: true },
   totalStock: { type: Number, default: 0 },
   price: { type: Number, required: true },
@@ -50,7 +50,7 @@ womensWASchema.pre("save", async function (next) {
     this.sku = SKU_Genertor.generateSKUforWatchesAndAccessories(
       this.productID,
       this.name,
-      this.productType,
+      this.subCategory,
       mat
     );
   }

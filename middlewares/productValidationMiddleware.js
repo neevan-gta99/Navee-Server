@@ -16,15 +16,12 @@ async function sheetDataValidation(req, res, next) {
                 expectedImageNames.includes(file.filename)
             );
 
-            console.log(product.ProductName + " " + matchedImages.length + " " + expectedImageNames.length);
-
             if (matchedImages.length !== expectedImageNames.length) {
                 failedProducts.push({
                     ProductName: product.ProductName,
                     reason: "Images mismatch: May be Image Name wrong in sheet so this will mismatch from Image File",
                 });
 
-                // console.log(`❌ Mismatch Image: ${product.ProductName}`);
                 return null;
             }
 
@@ -58,13 +55,13 @@ async function sheetDataValidation(req, res, next) {
                 product.totalStock = totalStock;
 
                 validProducts.push(product);
+                 
             } catch (err) {
                 failedProducts.push({
                     ProductName: product.ProductName,
                     reason: `Size variant error: ${err.message}`,
                 });
 
-                // console.log(`❌ Size Variant Error: ${product.ProductName}`);
                 return null;
 
             }
@@ -73,7 +70,6 @@ async function sheetDataValidation(req, res, next) {
 
     req.products = validProducts;
     req.failedUploads.push(...failedProducts);
-    console.log("Ye aaya Product Validation mai");
     next();
 }
 
