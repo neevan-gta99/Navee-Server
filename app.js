@@ -5,6 +5,7 @@ import users from './routes/userRoutes.js'
 import test from './routes/testRoutes.js'
 import product from './routes/addProductRoutes.js'
 import seller from './routes/sellerRoutes.js'
+import admin from './routes/adminRoutes.js'
 import getProducts from './routes/getProductRoutes.js';
 
 const app = express();
@@ -26,11 +27,14 @@ app.use('/api/users',users);
 app.use('/api/test',test);
 app.use('/api/addProduct', product);
 app.use('/api/seller', seller);
+app.use('/api/admin', admin);
 app.use('/api/getProduct',getProducts)
 
-// app.use((req, res) => {
+
+
+// app.use('/api/admin/login',(req, res) => {
 //   console.log("yes");
-//   res.status(404).json({ error: "Route not found" });
+//   res.status(200).json({ message: "Route found" });
 // });
 
 export default app;

@@ -15,13 +15,14 @@ const mensFootwearSchema = new mongoose.Schema({
   discount: { type: Number, default: 0 },
   finalPrice: { type: Number },
   isOnSale: { type: Boolean, default: false },
-  outerMaterial: { type: String, required: true },
-  soleMaterial: { type: String, required: true },
+  outerMaterial: { type: String},
+  soleMaterial: { type: String },
   closure: { type: String, required: true },
   pattern: { type: String, required: true },
   occasion: { type: String, required: true },
   status: { type: String, default: "Active" },
   variants: [schemaOfVariant.sizeAndVariantsSchema],
+  hot: { type: Boolean, default: false },
   sku: {type: String,unique: true},
   images: [
     {
@@ -38,6 +39,8 @@ mensFootwearSchema.pre("save", async function (next) {
     this.finalPrice = this.price - (this.price * this.discount / 100);
   }
 
+  console.log("Schemma mai aaya ");
+  
   // Generate SKU only once if it doesn't already exist
   if (!this.sku) {
     this.sku = SKU_Genertor.generateSKUForMenFootWear(

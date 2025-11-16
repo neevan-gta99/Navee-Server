@@ -22,6 +22,7 @@ const girlsWASchema = new mongoose.Schema({
   movement: { type: String },
   status: { type: String, default: "Active" },
   variants: [schemaOfVariant.sizeAndVariantsSchema],
+  hot: { type: Boolean, default: false },
   sku: { type: String, unique: true },
   images: [
     {

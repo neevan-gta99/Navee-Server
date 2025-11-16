@@ -35,7 +35,7 @@ const checkCred = async (req, res) => {  // Note: Added `res` parameter
     );
 
     // � Step 4: Set HTTP-only cookie
-    res.cookie('token', token, {
+    res.cookie('sellerToken', token, {
       httpOnly: true,      // Prevent XSS attacks
       secure: true,        // HTTPS-only (enable in production)
       sameSite: 'None',  // CSRF protection

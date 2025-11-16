@@ -1,14 +1,12 @@
 import products_Model from '../models/addProductsModel.js';
 
-const menTopwear = async (req, res) => {
-  try {
-    const { success, failed } = await products_Model.addMenTopwear(req);
+const commonController = (req, success, failed) => {
 
-    let message = "";
-    let statusCode;
-    
-    if(req.uploadType){
-      message =
+  let message = "";
+  let statusCode;
+
+  if (req.uploadType) {
+    message =
       failed.length === 0
         ? "Bulk upload completed successfully!"
         : success.length === 0
@@ -21,19 +19,34 @@ const menTopwear = async (req, res) => {
         : success.length === 0
           ? 400
           : 207;
-    }
-    else{
-      message =
+  }
+  else {
+    message =
       failed.length === 0 ? `${req.body.name}! upload successfully!` : "Upload failed!";
-      statusCode =
+    statusCode =
       failed.length === 0 ? 200 : 400;
 
-    }
-        
+  }
+
+  return {
+    statusCode,
+    message,
+    successID: success,
+    failedList: failed
+  };
+
+
+}
+
+const menTopwear = async (req, res) => {
+  try {
+    const { success, failed } = await products_Model.addMenTopwear(req);
+
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
     res.status(statusCode).json({
       message,
-      success,
-      failed
+      successID,
+      failedList
     });
 
   } catch (err) {
@@ -45,9 +58,15 @@ const menTopwear = async (req, res) => {
 const menBottomwear = async (req, res) => {
   try {
 
-    const productID = await products_Model.addMenBottomwear(req);
+    const { success, failed } = await products_Model.addMenBottomwear(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -55,9 +74,18 @@ const menBottomwear = async (req, res) => {
 const menFootmwear = async (req, res) => {
   try {
 
-    const productID = await products_Model.addMenFootwear(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    console.log("Men footwear mai call Ayy");
+    
+    const { success, failed } = await products_Model.addMenFootwear(req);
+
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -65,9 +93,15 @@ const menFootmwear = async (req, res) => {
 const womenEthnic = async (req, res) => {
   try {
 
-    const productID = await products_Model.addWomenEthnic(req);
+    const { success, failed } = await products_Model.addWomenEthnic(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -75,9 +109,15 @@ const womenEthnic = async (req, res) => {
 const womenWestern = async (req, res) => {
   try {
 
-    const productID = await products_Model.addWomenWestern(req);
+    const { success, failed } = await products_Model.addWomenWestern(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -85,9 +125,15 @@ const womenWestern = async (req, res) => {
 const womenFootwear = async (req, res) => {
   try {
 
-    const productID = await products_Model.addWomenFootwear(req);
+    const { success, failed } = await products_Model.addWomenFootwear(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -95,9 +141,15 @@ const womenFootwear = async (req, res) => {
 const boysBrands = async (req, res) => {
   try {
 
-    const productID = await products_Model.addBoysBrands(req);
+    const { success, failed } = await products_Model.addBoysBrands(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -105,9 +157,15 @@ const boysBrands = async (req, res) => {
 const girlsGrands = async (req, res) => {
   try {
 
-    const productID = await products_Model.addGirlsGrands(req);
+    const { success, failed } = await products_Model.addGirlsGrands(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -115,9 +173,15 @@ const girlsGrands = async (req, res) => {
 const menWA = async (req, res) => {
   try {
 
-    const productID = await products_Model.addMenWA(req);
+    const { success, failed } = await products_Model.addMenWA(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -125,9 +189,15 @@ const menWA = async (req, res) => {
 const womenWA = async (req, res) => {
   try {
 
-    const productID = await products_Model.addWomenWA(req);
+    const { success, failed } = await products_Model.addWomenWA(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -135,9 +205,15 @@ const womenWA = async (req, res) => {
 const boysWA = async (req, res) => {
   try {
 
-    const productID = await products_Model.addBoyWA(req);
+    const { success, failed } = await products_Model.addBoyWA(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -145,9 +221,15 @@ const boysWA = async (req, res) => {
 const girlsWA = async (req, res) => {
   try {
 
-    const productID = await products_Model.addGirlWA(req);
+    const { success, failed } = await products_Model.addGirlWA(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -155,9 +237,15 @@ const girlsWA = async (req, res) => {
 const bags = async (req, res) => {
   try {
 
-    const productID = await products_Model.addBag(req);
+    const { success, failed } = await products_Model.addBag(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -165,9 +253,15 @@ const bags = async (req, res) => {
 const suitcases = async (req, res) => {
   try {
 
-    const productID = await products_Model.addSuitcase(req);
+    const { success, failed } = await products_Model.addSuitcase(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
@@ -175,9 +269,15 @@ const suitcases = async (req, res) => {
 const luggage = async (req, res) => {
   try {
 
-    const productID = await products_Model.addLuggage(req);
+    const { success, failed } = await products_Model.addLuggage(req);
 
-    res.status(200).json({ message: "Product Added Successfully!", productID });
+    const { statusCode, message, successID, failedList } = commonController(req, success, failed)
+    res.status(statusCode).json({
+      message,
+      successID,
+      failedList
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }

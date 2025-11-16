@@ -4,7 +4,7 @@ import cloudinary from "../utils/cloudinary.js";
 import ID_Generator from "../utils/sequenceIdGenerator.js";
 import all_Codes from "../utils/codes.js";
 
-const menTopWearUploadsBulk = async function (req, res, next) {
+const allBulkUploader = async function (req, res, next) {
   
   try {
     
@@ -68,10 +68,15 @@ const menTopWearUploadsBulk = async function (req, res, next) {
           };
         });
 
-        console.log(product.uploadedImages);
         return product;
       })
     );
+    
+    console.log(req.products);
+    console.log("======================================================");
+    
+    console.log(req.products[0].uploadedImages);
+    
     req.uploadType = "bulk";
     next();
   }
@@ -82,5 +87,5 @@ const menTopWearUploadsBulk = async function (req, res, next) {
 
 };
 
-const bulkProductsImagesUploader = { menTopWearUploadsBulk }
+const bulkProductsImagesUploader = { allBulkUploader }
 export default bulkProductsImagesUploader;

@@ -4,7 +4,7 @@ function sizeVariantsRegex(sizeBlocks) {
   let malformedBlock = null;
 
   for (const block of sizeBlocks) {
-    const sizeMatch = block.match(/^([A-Z]+[XL]*)-/);
+    const sizeMatch = block.match(/^(.+?)-/);
     if (!sizeMatch) {
       malformedBlock = block;
       break;
@@ -24,6 +24,8 @@ function sizeVariantsRegex(sizeBlocks) {
   }
 
   if (malformedBlock) {
+    console.log(malformedBlock);
+    
     console.log("Error Pakdi");
     throw new Error("Invalid Sizes Format Information");
   }

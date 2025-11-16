@@ -18,9 +18,9 @@ const luggageSchema = new mongoose.Schema({
   material: { type: String, required: true },
   capacity: { type: String, required: true },
   numWheels: { type: String, required: true },
-  lockType: { type: String, required: true },
   features: [String],
   variants: [schemaOfVariant.sizeAndVariantsSchema],
+  hot: { type: Boolean, default: false },
   sku: { type: String, unique: true },
   images: [
     {

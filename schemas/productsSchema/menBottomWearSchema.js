@@ -20,6 +20,7 @@ const mensBottomwearSchema = new mongoose.Schema({
   waistRise: { type: String, required: true },
   status: { type: String, default: "Active" },
   variants: [schemaOfVariant.sizeAndVariantsSchema],
+  hot: { type: Boolean, default: false },
   sku: {type: String,unique: true},
   images: [
     {

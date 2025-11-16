@@ -17,7 +17,7 @@ const csvParser = (req, res, next) => {
   stream
     .pipe(csv({
       mapHeaders: ({ header, index }) => {
-        
+
         let cleanedHeader = header.trim();
         cleanedHeader = cleanedHeader
           .split(" ")
@@ -59,7 +59,7 @@ const csvParser = (req, res, next) => {
       }
 
       if (!req.failedUploads) req.failedUploads = [];
-      
+
       const validProducts = [];
       const failedProducts = [];
 
@@ -83,13 +83,13 @@ const csvParser = (req, res, next) => {
 
       const withoutSpacedProCategory = req.body.collection.replace(/\s+/g, "");
 
-      if(all_Codes.miniCategoryMap[withoutSpacedProCategory]){
-          validProducts.map((product)=>{
-            if(product.Category){
-              product.Category = all_Codes.miniCategoryMap[withoutSpacedProCategory];
-            }
-          });
-        }
+      if (all_Codes.miniCategoryMap[withoutSpacedProCategory]) {
+        validProducts.map((product) => {
+          if (product.Category) {
+            product.Category = all_Codes.miniCategoryMap[withoutSpacedProCategory];
+          }
+        });
+      }
 
       next();
     })
@@ -107,8 +107,13 @@ function busboyParserForCSV(req, res, next) {
   req.files = {};
 
   busboy.on("field", (name, value) => {
-    req.body[name] = value;
+    if (name === "features") {
+      req.body.features = value.split(",").map(f => f.trim()); // ✅ Convert to array
+    } else {
+      req.body[name] = value;
+    }
   });
+
 
   busboy.on("file", (fieldname, file, info) => {
     const { filename, encoding, mimeType } = info;
@@ -167,28 +172,32 @@ function busboyParserForXL(req, res, next) {
   req.body = {};
   req.files = {};
 
-  
-  busboy.on("field", (name, value) => {
 
-    if(name == "failedUploadsFromClient"){
+  busboy.on("field", (name, value) => {
+    console.log("Bus boy in XL");
+
+    if (name === "failedUploadsFromClient") {
       req.failedUploadsFromClient = JSON.parse(value);
       console.log(req.failedUploadsFromClient);
-      
-    }
-
-    else if (name == "products") {
+    } else if (name === "products") {
       try {
         req.products = JSON.parse(value);
-        // console.log("✅ Cleaned products:", req.products);
       } catch (err) {
         console.error("❌ Invalid products JSON");
         return res.status(400).json({ error: "Invalid products JSON" });
       }
+    } else if (name === "features") {
+      try {
+        req.body.features = JSON.parse(value); // ✅ Parse array
+      } catch (err) {
+        console.error("❌ Invalid features JSON");
+        req.body.features = []; // fallback
+      }
     } else {
       req.body[name] = value;
     }
-
   });
+
 
   busboy.on("file", (fieldname, file, info) => {
     const { filename, encoding, mimeType } = info;
@@ -224,7 +233,7 @@ function busboyParserForXL(req, res, next) {
         product.sellerID = req.body.sellerID;
       });
     }
-    console.log("✅ Busboy finished. Products:", Object.keys(req.files));
+    // console.log("✅ Busboy finished. Products:", Object.keys(req.files));
     next();
   });
 

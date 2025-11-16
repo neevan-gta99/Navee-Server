@@ -30,13 +30,14 @@ router.post('/luggage', upload.array("images", 10), singleProductImageUploader.s
 
 
 //For Bulk Product
-router.post('/men-topwear/bulk/csv', parser.busboyParserForCSV, parser.csvParser, product_Validator.sheetDataValidation, bulkProductsImagesUploader.menTopWearUploadsBulk, addProduct.menTopwear);
-router.post('/men-topwear/bulk/xlsx', parser.busboyParserForXL,bulkProductsImagesUploader.menTopWearUploadsBulk, addProduct.menTopwear);
+router.post('/men-topwear/bulk/csv', parser.busboyParserForCSV, parser.csvParser, product_Validator.sheetDataValidation, bulkProductsImagesUploader.allBulkUploader, addProduct.menTopwear);
+router.post('/men-topwear/bulk/xlsx', parser.busboyParserForXL,bulkProductsImagesUploader.allBulkUploader, addProduct.menTopwear);
 
 
-router.post('/men-bottomwear/bulk/csv', parser.busboyParserForCSV, parser.csvParser, product_Validator.sheetDataValidation, bulkProductsImagesUploader.menTopWearUploadsBulk, addProduct.menTopwear);
-router.post('/men-bottomwear/bulk/xlsx', parser.busboyParserForXL,bulkProductsImagesUploader.menTopWearUploadsBulk, addProduct.menTopwear);
+router.post('/men-bottomwear/bulk/csv', parser.busboyParserForCSV, parser.csvParser, product_Validator.sheetDataValidation, bulkProductsImagesUploader.allBulkUploader, addProduct.menBottomwear);
+router.post('/men-bottomwear/bulk/xlsx', parser.busboyParserForXL,bulkProductsImagesUploader.allBulkUploader, addProduct.menBottomwear);
 
-
+router.post('/men-footwear/bulk/csv', parser.busboyParserForCSV, parser.csvParser, product_Validator.sheetDataValidation, bulkProductsImagesUploader.allBulkUploader, addProduct.menFootmwear);
+router.post('/men-footwear/bulk/xlsx', parser.busboyParserForXL,bulkProductsImagesUploader.allBulkUploader, addProduct.menFootmwear);
 
 export default router;

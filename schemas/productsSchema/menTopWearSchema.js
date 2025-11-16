@@ -21,7 +21,7 @@ const mensTopwearSchema = new mongoose.Schema({
   neck: { type: String, required: true },
   status: { type: String, default: "Active" },
   variants: [schemaOfVariant.sizeAndVariantsSchema],
-  hot: { type: String },
+  hot: { type: Boolean, default: false },
   // SKU is at the product level, as you requested
   sku: {type: String,unique: true},
   images: [

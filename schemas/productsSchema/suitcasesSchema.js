@@ -21,6 +21,7 @@ const suitcasesSchema = new mongoose.Schema({
   lockType: { type: String, required: true },
   features: [String],
   variants: [schemaOfVariant.sizeAndVariantsSchema],
+  hot: { type: Boolean, default: false },
   sku: { type: String, unique: true },
   images: [
     {

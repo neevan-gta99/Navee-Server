@@ -1,32 +1,48 @@
-import { mensTopwearDTO } from '../schemas/productsSchema/menTopWearSchema.js';
-import { mensBottomwearDTO } from '../schemas/productsSchema/menBottomWearSchema.js';
-import { mensFootwearDTO } from '../schemas/productsSchema/menFootWearSchema.js';
-import { womensEthnicDTO } from '../schemas/productsSchema/womenEthnicSchema.js';
-import { womensWesternDTO } from '../schemas/productsSchema/womenWesternSchema.js';
-import { womensFootwearDTO } from '../schemas/productsSchema/womenFootwearSchema.js';
-import { boysBrandsDTO } from '../schemas/productsSchema/boysBrandsSchema.js';
-import { girlsGrandsDTO } from '../schemas/productsSchema/girlsGrandsSchema.js';
-import { mensWADTO } from '../schemas/productsSchema/mensWASchema.js';
-import { womensWADTO } from '../schemas/productsSchema/womensWASchema.js';
-import { boysWADTO } from '../schemas/productsSchema/boysWASchema.js';
-import { girlsWADTO } from '../schemas/productsSchema/girlsWASchema.js';
-import { bagsDTO } from '../schemas/productsSchema/bagsSchema.js';
-import { suitcasesDTO } from '../schemas/productsSchema/suitcasesSchema.js';
-import { luggageDTO } from '../schemas/productsSchema/luggageSchema.js';
-
 import buildDTO from '../DTOs/productDTOs.js';
-import Size_Variant_Regex_Checker from '../utils/bulkUploadSizeVariantRegex.js';
 
-const addMenTopwear = async (req) => {
+
+const dtoMap = {
+    menTop: buildDTO.buildMensTopwearDTO,
+    menBottom: buildDTO.buildMensBottomwearDTO,
+    menFoot: buildDTO.buildMensFootwearDTO,
+    womenEthnic: buildDTO.buildWomensEthnicDTO,
+    womenWest: buildDTO.buildWomensWesternDTO,
+    womenFoot: buildDTO.buildWomensFootwearDTO,
+    boysBrands: buildDTO.buildBoysBrandsDTO,
+    girlsGrands: buildDTO.buildGirlsGrandsDTO,
+    mensWA: buildDTO.buildMensWADTO,
+    womensWA: buildDTO.buildWomensWADTO,
+    boysWA: buildDTO.buildBoysWADTO,
+    girlsWA: buildDTO.buildGirlsWADTO,
+    bags: buildDTO.buildBagsDTO,
+    suitcases: buildDTO.buildSuitcasesDTO,
+    luggages: buildDTO.buildLuggagesDTO
+};
+
+async function giveDTO(condition_category, product) {
+
+    const builderFn = dtoMap[condition_category];
+    if (!builderFn) {
+        throw new Error("Invalid condition category");
+    }
+    return await builderFn(product, product.uploadedImages);
+
+}
+
+const commonModelUploader = async (req, condition_category) => {
+
     if (req.uploadType === "bulk") {
         const rejectedProducts = [];
 
         const results = await Promise.allSettled(
             req.products.map(async (product) => {
                 try {
-                    const menTop = await buildDTO.buildMensTopwearDTO(product, product.uploadedImages);
-                    await menTop.save();
-                    return menTop.productID;
+                    console.log("Common Uploader =================");
+                    console.log(product);
+                    
+                    const commonDB = await giveDTO(condition_category, product);
+                    await commonDB.save();
+                    return commonDB.productID;
                 } catch (err) {
                     const identifier = product.ProductName || product.productID || "Unknown Product";
                     rejectedProducts.push(product);
@@ -50,14 +66,14 @@ const addMenTopwear = async (req) => {
 
         let failed = [];
 
-        if(req.failedUploadsFromClient){
+        if (req.failedUploadsFromClient) {
             failed = [...failedFromValidation, ...failedFromSave, ...req.failedUploadsFromClient];
         }
-        else{
+        else {
 
             failed = [...failedFromValidation, ...failedFromSave];
         }
-        
+
         console.log("Success:", success);
         console.log("Failed:", failed);
 
@@ -81,586 +97,62 @@ const addMenTopwear = async (req) => {
         body.price = Number(body.price);
         body.discount = Number(body.discount);
 
-        const menTop = buildDTO.buildMensTopwearDTO(body, body.uploadedImages);
-        await menTop.save();
+        const commonDB = await giveDTO(condition_category, body);
+        await commonDB.save();
 
-        return { success: [menTop.productID], failed: [] };
+        return { success: [commonDB.productID], failed };
+
     }
+
+
+}
+
+const addMenTopwear = async (req) => {
+    return await commonModelUploader(req, "menTop");
 };
-
-
 
 const addMenBottomwear = async (req) => {
-
-
-    const body = req.body;
-
-    console.log(body);
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-
-    const menBottom = new mensBottomwearDTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        fit: body.fit,
-        waistRise: body.waistRise,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        totalStock: body.totalStock,
-        variants: body.variants,
-        images: req.uploadedImages,
-    });
-
-    await menBottom.save();
-
-    return menBottom.productID;
+    return await commonModelUploader(req, "menBottom");
 };
+
 const addMenFootwear = async (req) => {
-    const body = req.body;
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-
-    const menFoot = new mensFootwearDTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        price: body.price,
-        discount: body.discount,
-        outerMaterial: body.outerMaterial,
-        soleMaterial: body.soleMaterial,
-        closure: body.closure,
-        pattern: body.pattern,
-        occasion: body.occasion,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        totalStock: body.totalStock,
-        variants: body.variants,
-        images: req.uploadedImages,
-    });
-
-    await menFoot.save();
-
-    return menFoot.productID;
+    return await commonModelUploader(req, "menFoot");
 };
 const addWomenEthnic = async (req) => {
-    const body = req.body;
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const womenEthnic = new womensEthnicDTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        fit: body.fit,
-        sleeve: body.sleeve,
-        neck: body.neck,
-        pattern: body.pattern,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        totalStock: body.totalStock,
-        variants: body.variants,
-        images: req.uploadedImages,
-    });
-
-    await womenEthnic.save();
-
-    return womenEthnic.productID;
+    return await commonModelUploader(req, "womenEthnic");
 };
 const addWomenWestern = async (req) => {
-    const body = req.body;
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const womenWestern = new womensWesternDTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        fit: body.fit,
-        sleeve: body.sleeve,
-        neck: body.neck,
-        pattern: body.pattern,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        totalStock: body.totalStock,
-        variants: body.variants,
-        images: req.uploadedImages,
-    });
-
-    await womenWestern.save();
-
-    return womenWestern.productID;
+    return await commonModelUploader(req, "womenWest");
 };
 const addWomenFootwear = async (req) => {
-    const body = req.body;
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const womenFoot = new womensFootwearDTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        price: body.price,
-        discount: body.discount,
-        outerMaterial: body.outerMaterial,
-        soleMaterial: body.soleMaterial,
-        closure: body.closure,
-        heelHeight: body.heelHeight,
-        occasion: body.occasion,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        totalStock: body.totalStock,
-        variants: body.variants,
-        images: req.uploadedImages,
-    });
-
-    await womenFoot.save();
-
-    return womenFoot.productID;
+    return await commonModelUploader(req, "womenFoot");
 };
 const addBoysBrands = async (req) => {
-    const body = req.body;
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const boysBrand = new boysBrandsDTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        subSubCategory: body.subSubCategory,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        outerMaterial: body.outerMaterial,
-        sleeve: body.sleeve,
-        neck: body.neck,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        totalStock: body.totalStock,
-        variants: body.variants,
-        images: req.uploadedImages,
-    });
-
-    await boysBrand.save();
-
-    return boysBrand.productID;
+    return await commonModelUploader(req, "boysBrands");
 };
 const addGirlsGrands = async (req) => {
-    const body = req.body;
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const girlsGrand = new girlsGrandsDTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        subSubCategory: body.subSubCategory,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        outerMaterial: body.outerMaterial,
-        sleeve: body.sleeve,
-        neck: body.neck,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        totalStock: body.totalStock,
-        variants: body.variants,
-        images: req.uploadedImages,
-    });
-
-    await girlsGrand.save();
-
-    return girlsGrand.productID;
+    return await commonModelUploader(req, "girlsGrands");
 };
 const addMenWA = async (req) => {
-    const body = req.body;
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const mensWA = new mensWADTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        subSubCategory: body.subSubCategory,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        dialShape: body.dialShape,
-        strapMaterial: body.strapMaterial,
-        movement: body.movement,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        totalStock: body.totalStock,
-        variants: body.variants,
-        images: req.uploadedImages,
-    });
-
-    await mensWA.save();
-
-    return mensWA.productID;
+    return await commonModelUploader(req, "mensWA");
 };
 const addWomenWA = async (req) => {
-    const body = req.body;
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const womensWA = new womensWADTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        subSubCategory: body.subSubCategory,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        dialShape: body.dialShape,
-        strapMaterial: body.strapMaterial,
-        movement: body.movement,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        variants: body.variants,
-        totalStock: body.totalStock,
-        images: req.uploadedImages,
-    });
-
-    await womensWA.save();
-
-    return womensWA.productID;
+    return await commonModelUploader(req, "womensWA");
 };
 const addBoyWA = async (req) => {
-    const body = req.body;
-    console.log(body);
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const boysWA = new boysWADTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        subSubCategory: body.subSubCategory,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        dialShape: body.dialShape,
-        strapMaterial: body.strapMaterial,
-        movement: body.movement,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        totalStock: body.totalStock,
-        variants: body.variants,
-        images: req.uploadedImages,
-    });
-
-    await boysWA.save();
-
-    return boysWA.productID;
+    return await commonModelUploader(req, "boysWA"); 
 };
 const addGirlWA = async (req) => {
-    const body = req.body;
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const girlsWA = new girlsWADTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        subSubCategory: body.subSubCategory,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        dialShape: body.dialShape,
-        strapMaterial: body.strapMaterial,
-        movement: body.movement,
-        status: "Active",
-        isOnSale: true,
-        gender: body.gender,
-        variants: body.variants,
-        totalStock: body.totalStock,
-        images: req.uploadedImages,
-    });
-
-    await girlsWA.save();
-
-    return girlsWA.productID;
+    return await commonModelUploader(req, "girlsWA");
 };
 const addBag = async (req) => {
-    const body = req.body;
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const bags = new bagsDTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        gender: body.gender,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        capacity: body.capacity,
-        features: body.features,
-        status: "Active",
-        isOnSale: true,
-        variants: body.variants,
-        images: req.uploadedImages,
-    });
-
-    await bags.save();
-
-    return bags.productID;
+    return await commonModelUploader(req, "bags");
 };
 const addSuitcase = async (req) => {
-    const body = req.body;
-    console.log(body);
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const suitcases = new suitcasesDTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        gender: body.gender,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        capacity: body.capacity,
-        features: body.features,
-        shellType: body.shellType,
-        numWheels: body.numWheels,
-        lockType: body.lockType,
-        status: "Active",
-        isOnSale: true,
-        variants: body.variants,
-        totalStock: body.totalStock,
-        images: req.uploadedImages,
-    });
-
-    await suitcases.save();
-
-    return suitcases.productID;
+    return await commonModelUploader(req, "suitcases"); 
 };
 const addLuggage = async (req) => {
-    const body = req.body;
-
-    if (typeof body.variants === "string") {
-        try {
-            body.variants = JSON.parse(body.variants);
-        } catch (err) {
-            throw new Error("Invalid variants format");
-        }
-    }
-
-    body.price = Number(body.price);
-    body.discount = Number(body.discount);
-    body.isOnSale = body.isOnSale === "true";
-
-    const luggage = new luggageDTO({
-        sellerID: body.sellerID,
-        productID: body.productID,
-        name: body.name,
-        brand: body.brand,
-        category: body.category,
-        subCategory: body.subCategory,
-        gender: body.gender,
-        price: body.price,
-        discount: body.discount,
-        material: body.material,
-        capacity: body.capacity,
-        features: body.features,
-        numWheels: body.numWheels,
-        lockType: body.lockType,
-        status: "Active",
-        isOnSale: true,
-        variants: body.variants,
-        totalStock: body.totalStock,
-        images: req.uploadedImages,
-    });
-
-    await luggage.save();
-
-    return luggage.productID;
+    return await commonModelUploader(req, "luggages");
 };
 
 const products_Model = { addMenTopwear, addMenBottomwear, addMenFootwear, addWomenEthnic, addWomenWestern, addWomenFootwear, addBoysBrands, addGirlsGrands, addMenWA, addWomenWA, addBoyWA, addGirlWA, addBag, addSuitcase, addLuggage }

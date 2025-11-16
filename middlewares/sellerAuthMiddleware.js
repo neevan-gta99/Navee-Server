@@ -67,7 +67,7 @@ const isTokenUser = (req, res, next) => {
 export const isTokenUserWithCookie = async (req, res, next) => {
 
   try {
-    const token = req.cookies.token;
+    const token = req.cookies.sellerToken;
     
     if (!token) {
       return res.status(401).json({
@@ -96,7 +96,7 @@ export const isTokenUserWithCookie = async (req, res, next) => {
     next();
 
   } catch (error) {
-    res.clearCookie('token');
+    res.clearCookie('sellerToken');
 
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({
@@ -122,7 +122,7 @@ export const isTokenUserWithCookie = async (req, res, next) => {
 
 export const checkAuthStatus  = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const token = req.cookies.sellerToken;
 
     // 401 Unauthorized if no token
     if (!token) {
@@ -142,7 +142,7 @@ export const checkAuthStatus  = async (req, res, next) => {
 
   } catch (error) {
     // Clear invalid/expired token
-    res.clearCookie('token');
+    res.clearCookie('sellerToken');
 
     // Different status codes based on error type
     if (error instanceof jwt.TokenExpiredError) {
@@ -168,9 +168,9 @@ export const checkAuthStatus  = async (req, res, next) => {
 };
 
 // In your authController.js
-export const logout = (req, res) => {
+const logout = (req, res) => {
   try {
-    res.clearCookie('token', {
+    res.clearCookie('sellerToken', {
       httpOnly: true,
       secure: false, // सीधे false सेट करें
       sameSite: 'strict'
