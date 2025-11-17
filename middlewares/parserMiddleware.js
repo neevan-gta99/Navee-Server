@@ -51,6 +51,7 @@ const csvParser = (req, res, next) => {
       if (req.body && Object.keys(req.body).length > 0) {
         results.forEach((product) => {
           for (const key in req.body) {
+            
             if (!product.hasOwnProperty(key)) {
               product[key] = req.body[key];
             }
@@ -64,6 +65,10 @@ const csvParser = (req, res, next) => {
       const failedProducts = [];
 
       results.forEach((product) => {
+
+        product.Sizes = product.Sizes.replace(/\s+/g, "");
+        
+
         const imageNames = typeof product.Images === "string"
           ? product.Images.split(",").map(name => name.trim())
           : [];
