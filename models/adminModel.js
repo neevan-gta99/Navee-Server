@@ -2,6 +2,8 @@ import adminDTO from '../schemas/adminSchema.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { MongoClient } from "mongodb";
+
 
 dotenv.config();
 
@@ -86,5 +88,39 @@ const checkCred = async (req, res) => {  // Note: Added `res` parameter
 };
 
 
-const admin_Login_Model = { getAdmin, checkCred };
-export default admin_Login_Model;
+const dbMigrate = async () => {
+
+  const localClient = new MongoClient("mongodb://127.0.0.1:27017/NaveeGoods");
+  const atlasClient = new MongoClient("mongodb+srv://naveegoods6542_db_user:sUL8YGKHNmVGex9M@cluster0.it0fcg1.mongodb.net/?appName=Cluster0");
+
+
+
+  await localClient.connect();
+  await atlasClient.connect();
+
+  const localDB = localClient.db("NaveeGoods");
+  const atlasDB = atlasClient.db("Trendora");
+
+  const collections = await localDB.listCollections().toArray();
+
+  for (const { name } of collections) {
+    const localData = await localDB.collection(name).find().toArray();
+
+    for (const doc of localData) {
+      await atlasDB.collection(name).updateOne(
+        { _id: doc._id },   // match by _id
+        { $set: doc },      // update with local data
+        { upsert: true }    // insert if not exists
+      );
+    }
+
+    console.log(`✅ Synced collection: ${name} (${localData.length} docs checked)`);
+  }
+
+  await localClient.close();
+  await atlasClient.close();
+
+}
+
+const admin_Model = { getAdmin, checkCred, dbMigrate };
+export default admin_Model;
