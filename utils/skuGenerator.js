@@ -26,12 +26,12 @@ function generateSKUForWomenEthnic(productID, name, material, fit) {
   const fitCode = fit.toUpperCase();
   return `${productID}-${nameCode}-${materialCode}-${fitCode}`;
 }
-function generateSKUForWomenWestern(productID, name, material, pattern) {
+function generateSKUForWomenWestern(productID, name, subCategory, material) {
   const nameCode = name.replace(/\s+/g, '').toUpperCase().slice(0, 5);
   const materialCode = material.toUpperCase();
   // Correcting the syntax here
-  const patternCode = pattern.toUpperCase();
-  return `${productID}-${nameCode}-${materialCode}-${patternCode}`;
+  const subCategoryCode = subCategory.toUpperCase();
+  return `${productID}-${nameCode}-${subCategoryCode}-${materialCode}`;
 }
 function generateSKUForWomenFootwear(productID, name, outerMaterial, occasion) {
   const nameCode = name.replace(/\s+/g, '').toUpperCase().slice(0, 5);
