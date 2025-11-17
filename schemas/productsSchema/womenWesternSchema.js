@@ -44,8 +44,8 @@ womensWesternSchema.pre("save", async function (next) {
     this.sku = SKU_Genertor.generateSKUForWomenWestern(
       this.productID,
       this.name,
+      this.subCategory,
       this.material,
-      this.pattern
     );
   }
 
