@@ -135,7 +135,7 @@ function buildWomensWesternDTO(body, uploadedImages) {
     gender: body.gender,
     totalStock: body.totalStock,
     variants: body.variants,
-    images: req.uploadedImages,
+    images: uploadedImages,
   });
 }
 
