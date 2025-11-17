@@ -44,7 +44,7 @@ womensFootwearSchema.pre("save", async function (next) {
     this.sku = SKU_Genertor.generateSKUForWomenFootwear(
       this.productID,
       this.name,
-      this.outerMaterial,
+      this.subCategory,
       this.occasion
     );
   }

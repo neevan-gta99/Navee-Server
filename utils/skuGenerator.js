@@ -33,12 +33,12 @@ function generateSKUForWomenWestern(productID, name, subCategory, material) {
   const subCategoryCode = subCategory.toUpperCase();
   return `${productID}-${nameCode}-${subCategoryCode}-${materialCode}`;
 }
-function generateSKUForWomenFootwear(productID, name, outerMaterial, occasion) {
+function generateSKUForWomenFootwear(productID, name, subCategory, occasion) {
   const nameCode = name.replace(/\s+/g, '').toUpperCase().slice(0, 5);
-  const outerMaterialCode = outerMaterial.toUpperCase();
+  const subCategoryCode = subCategory.toUpperCase();
   // Correcting the syntax here
   const occasionCode = occasion.toUpperCase();
-  return `${productID}-${nameCode}-${outerMaterialCode}-${occasionCode}`;
+  return `${productID}-${nameCode}-${subCategoryCode}-${occasionCode}`;
 }
 function generateSKUForBBdsAndGGds(productID, name, subCategory, mat) {
   const nameCode = name.replace(/\s+/g, '').toUpperCase().slice(0, 5);
