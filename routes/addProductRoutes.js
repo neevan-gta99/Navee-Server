@@ -58,8 +58,8 @@ router.post('/girls-grands/bulk/xlsx', parser.busboyParserForXL,bulkProductsImag
 router.post('/mens-watches-and-accessories/bulk/csv', parser.busboyParserForCSV, parser.csvParser, product_Validator.sheetDataValidation, bulkProductsImagesUploader.allBulkUploader, addProduct.menWA);
 router.post('/mens-watches-and-accessories/bulk/xlsx', parser.busboyParserForXL,bulkProductsImagesUploader.allBulkUploader, addProduct.menWA);
 
-router.post('/wommens-watches-and-accessories/bulk/csv', parser.busboyParserForCSV, parser.csvParser, product_Validator.sheetDataValidation, bulkProductsImagesUploader.allBulkUploader, addProduct.womenWA);
-router.post('/wommens-watches-and-accessories/bulk/xlsx', parser.busboyParserForXL,bulkProductsImagesUploader.allBulkUploader, addProduct.womenWA);
+router.post('/womens-watches-and-accessories/bulk/csv', parser.busboyParserForCSV, parser.csvParser, product_Validator.sheetDataValidation, bulkProductsImagesUploader.allBulkUploader, addProduct.womenWA);
+router.post('/womens-watches-and-accessories/bulk/xlsx', parser.busboyParserForXL,bulkProductsImagesUploader.allBulkUploader, addProduct.womenWA);
 
 router.post('/boys-watches-and-accessories/bulk/csv', parser.busboyParserForCSV, parser.csvParser, product_Validator.sheetDataValidation, bulkProductsImagesUploader.allBulkUploader, addProduct.boysWA);
 router.post('/boys-watches-and-accessories/bulk/xlsx', parser.busboyParserForXL,bulkProductsImagesUploader.allBulkUploader, addProduct.boysWA);

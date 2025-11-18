@@ -14,8 +14,6 @@ const getAdmin = async (req, res) => {
 
 const adminLogin = async (req, res) => {
 
-  console.log("aaya admin login k liye");
-
   const authRes = await admin_Model.checkCred(req, res);
 
   res.status(authRes.code).json({ message: authRes.message, adminId: authRes.adminId, fullName: authRes.adminName });

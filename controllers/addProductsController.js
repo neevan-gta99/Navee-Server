@@ -76,7 +76,7 @@ const menFootmwear = async (req, res) => {
 
 
     console.log("Men footwear mai call Ayy");
-    
+
     const { success, failed } = await products_Model.addMenFootwear(req);
 
     const { statusCode, message, successID, failedList } = commonController(req, success, failed)
@@ -187,6 +187,7 @@ const menWA = async (req, res) => {
   }
 };
 const womenWA = async (req, res) => {
+
   try {
 
     const { success, failed } = await products_Model.addWomenWA(req);
@@ -201,7 +202,13 @@ const womenWA = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Error adding product", details: err.message });
   }
+
 };
+
+
+
+
+
 const boysWA = async (req, res) => {
   try {
 
