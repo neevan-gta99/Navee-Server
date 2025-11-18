@@ -35,12 +35,11 @@ function generateSKUForWomenWestern(productID, name, subCategory, material) {
 }
 function generateSKUForWomenFootwear(productID, name, subCategory, occasion) {
   const nameCode = name.replace(/\s+/g, '').toUpperCase().slice(0, 5);
+  
   const subCategoryCode = subCategory.toUpperCase();
   
   const occasionCode = occasion.toUpperCase();
 
-  console.log("yaha dikkat hai");
-  
   return `${productID}-${nameCode}-${subCategoryCode}-${occasionCode}`;
 }
 function generateSKUForBBdsAndGGds(productID, name, subCategory, mat) {
